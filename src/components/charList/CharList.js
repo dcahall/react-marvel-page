@@ -9,7 +9,9 @@ class CharList extends React.Component {
 	state = {
 		charList: [],
 		loading: true,
-		error: false
+		error: false,
+		newItemLoading: false,
+		offset: 210
 	}
 	
 	marvelService = new MarvelService();
@@ -18,19 +20,33 @@ class CharList extends React.Component {
 		this.updateCharacters();
 	}
 
-	onCharLoaded = (charList) => {
-		this.setState({charList, loading: false, error: false})
+	onCharListLoaded = (newCharList) => {
+		this.setState(({offset, charList}) => (
+			{
+				charList: [...charList, ...newCharList],
+				loading: false,
+				error: false,
+				newItemLoading: false,
+				offset: offset + 9,
+			}
+		));
 	}
 
 	onError = () => {
 		this.setState({loading: false, error: true});
 	}
 
-	updateCharacters = () => {
+	updateCharacters = (offset) => {
+		this.onNewItemLoading();
+
 		this.marvelService
-		.getAllCharacters()
-		.then(this.onCharLoaded)
+		.getAllCharacters(offset)
+		.then(this.onCharListLoaded)
 		.catch(this.onError);
+	}
+
+	onNewItemLoading = () => {
+		this.setState({newItemLoading: true});
 	}
 
 	createItemList = () => {
@@ -55,7 +71,7 @@ class CharList extends React.Component {
 	render() {
 		const itemList = this.createItemList();
 
-		const {loading, error} = this.state;
+		const {loading, error, newItemLoading, offset} = this.state;
 		const errorMessage = error ? <ErrorMessage/> : null;
 		const spinner = loading ? <Spinner/> : null;
 
@@ -63,7 +79,13 @@ class CharList extends React.Component {
 			<div className="char__list">
 				{errorMessage || spinner || itemList}
 				<button className="button button__main button__long">
-					<div className="inner">load more</div>
+					<div
+						className="inner"
+						disabled={newItemLoading}
+						onClick={() => this.updateCharacters(offset)}
+						onScroll={(e) => console.log(e)}>
+						load more
+					</div>
 				</button>
 			</div>
 		);
