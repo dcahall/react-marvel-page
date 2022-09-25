@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
@@ -113,7 +114,8 @@ const View = ({char, imageExist}) => {
 		</>);
 }
 
-export default CharInfo;
+CharInfo.propTypes = {
+	charId: PropTypes.number
+}
 
-// Если комиксов нет добавить заглушку
-// картику сделать ковер
+export default CharInfo;

@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from 'prop-types'
 
 import './charList.scss';
 import MarvelService from '../../services/MarvelService';
@@ -11,7 +12,8 @@ class CharList extends React.Component {
 		loading: true,
 		error: false,
 		newItemLoading: false,
-		offset: 210
+		offset: 210,
+		charEnded: false,
 	}
 	
 	marvelService = new MarvelService();
@@ -21,6 +23,11 @@ class CharList extends React.Component {
 	}
 
 	onCharListLoaded = (newCharList) => {
+		let ended = false;
+		if (newCharList.length < 9) {
+			ended = true
+		}
+
 		this.setState(({offset, charList}) => (
 			{
 				charList: [...charList, ...newCharList],
@@ -28,6 +35,7 @@ class CharList extends React.Component {
 				error: false,
 				newItemLoading: false,
 				offset: offset + 9,
+				charEnded: ended,
 			}
 		));
 	}
@@ -71,25 +79,27 @@ class CharList extends React.Component {
 	render() {
 		const itemList = this.createItemList();
 
-		const {loading, error, newItemLoading, offset} = this.state;
+		const {loading, error, newItemLoading, offset, charEnded} = this.state;
 		const errorMessage = error ? <ErrorMessage/> : null;
 		const spinner = loading ? <Spinner/> : null;
 
 		return (
 			<div className="char__list">
 				{errorMessage || spinner || itemList}
-				<button className="button button__main button__long">
-					<div
-						className="inner"
-						disabled={newItemLoading}
-						onClick={() => this.updateCharacters(offset)}
-						onScroll={(e) => console.log(e)}>
-						load more
-					</div>
+				<button className="button button__main button__long"
+					disabled={newItemLoading}
+					onClick={() => this.updateCharacters(offset)}
+					style={{'display' : charEnded ? 'none' : 'block'}}
+				>
+					<div className="inner">load more</div>
 				</button>
 			</div>
 		);
 	}
+}
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired
 }
 
 export default CharList;
