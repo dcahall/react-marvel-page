@@ -2,22 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types'
 
 import './charList.scss';
-import MarvelService from '../../services/MarvelService';
-import ErrorMessage from '../errorMessage/Error.Message';
+import useMarvelService from '../../services/MarvelService';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
 const CharList = (props) => {
 	const [charList, setCharList] = React.useState([]);
-	const [loading, setLoading] = React.useState(true);
-	const [error, setError] = React.useState(false);
 	const [newItemLoading, setNewItemLoading] = React.useState(false);
 	const [offset, setOffset] = React.useState(210);
 	const [charEnded, setCharEnded] = React.useState(false);
-	const marvelService = new MarvelService();
+	const {loading, error, getAllCharacters, imageExist} = useMarvelService();
 	const itemRefs = React.useRef([]);
 
 	React.useEffect(() => {
-		updateCharacters();
+		updateCharacters(offset, true);
 	}, []);
 
 	const onCharListLoaded = (newCharList) => {
@@ -27,28 +25,16 @@ const CharList = (props) => {
 		}
 
 		setCharList(charList => [...charList, ...newCharList]);
-		setLoading(loading => false);
-		setError(error => false);
 		setNewItemLoading(newItemLoading => false);
 		setOffset(offset => offset + 9);
 		setCharEnded(ended => ended);
 	}
 
-	const onError = () => {
-		setLoading(false);
-		setError(true);
-	}
-
-	const updateCharacters = (offset) => {
-		onNewItemLoading();
-
-		marvelService.getAllCharacters(offset)
+	const updateCharacters = (offset, initial) => {
+		initial ? setNewItemLoading(false) : setNewItemLoading(true);
+		
+		getAllCharacters(offset)
 			.then(onCharListLoaded)
-			.catch(onError);
-	}
-
-	const onNewItemLoading = () => {
-		setNewItemLoading(true);
 	}
 
 	const focusOnItem = (id) => {
@@ -59,7 +45,6 @@ const CharList = (props) => {
 
 	const createItemList = () => {
 		const chars = charList.map((item, i) => {
-			const imageExist = marvelService.imageExist(item);
 
 			return (<li
 						className="char__item"
@@ -77,7 +62,7 @@ const CharList = (props) => {
 						ref={(el) => itemRefs.current[i] = el}
 						tabIndex="0">
 							<img
-							style={imageExist ? {'objectFit': "contain"} : {'objectFit': "unset"}}
+							style={imageExist(item) ? {'objectFit': "contain"} : {'objectFit': "unset"}}
 							src={item.thumbnail}
 							alt={item.name}/>
 							<div className="char__name">{item.name}</div>
@@ -93,7 +78,7 @@ const CharList = (props) => {
 
 	const itemList = createItemList();
 	const errorMessage = error ? <ErrorMessage/> : null;
-	const spinner = loading ? <Spinner/> : null;
+	const spinner = loading && !newItemLoading ? <Spinner/> : null;
 
 	return (
 		<div className="char__list">

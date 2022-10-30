@@ -3,21 +3,15 @@ import PropTypes from 'prop-types';
 
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
-import ErrorMessage from '../errorMessage/Error.Message';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './charInfo.scss';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 const CharInfo = (props) => {
 
 	const [char, setChar] = React.useState(null);
-	const [loading, setLoading] = React.useState(false);
-	const [error, setError] = React.useState(false);
-	const marvelService = new MarvelService();
-
-	React.useEffect(() => {
-		updateChar();
-	}, [])
+	const {loading, error, getCharacter, imageExist, clearError} = useMarvelService();
 
 	React.useEffect(() => {
 		updateChar();
@@ -28,37 +22,26 @@ const CharInfo = (props) => {
 			return null;
 		}
 
-		onCharLoading();
-		marvelService.getCharacter(props.charId)
+		getCharacter(props.charId)
 			.then(onCharLoaded)
-			.catch(onError);
 	}
 
 	const onCharLoaded = (char) => {
+		clearError();
 		setChar(char);
-		setLoading(false);
-		setError(false);
 	}
 
-	const onError = () => {
-		setLoading(false);
-		setError(true);
-	}
-
-	const onCharLoading = () => {
-		setLoading(true);
-	}
-
-	const imageExist = char ? marvelService.imageExist(char) : null;
+	const imageEx = char ? imageExist(char) : null;
+	const skeleton = char ? null : <Skeleton/>
 	const errorMessage = error ? <ErrorMessage/> : null;
 	const spinner = loading ? <Spinner/> : null;
-	const content = char ? <View char={char} imageExist={imageExist} /> : <Skeleton/>;
+	const content = char ? <View char={char} imageExist={imageEx} /> : null;
 
-		return (
-			<div className="char__info">
-				{errorMessage || spinner || content}
-			</div>
-		);
+	return (
+		<div className="char__info">
+			{errorMessage || skeleton || spinner || content}
+		</div>
+	);
 }
 
 const View = ({char, imageExist}) => {
