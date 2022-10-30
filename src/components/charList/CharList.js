@@ -83,7 +83,8 @@ const CharList = (props) => {
 	return (
 		<div className="char__list">
 			{errorMessage || spinner || itemList}
-			<button className="button button__main button__long"
+			<button
+				className={`button button__main button__long ${newItemLoading ? `button__long_active` : null}`}
 				disabled={newItemLoading}
 				onClick={() => updateCharacters(offset)}
 				style={{'display' : charEnded ? 'none' : 'block'}}

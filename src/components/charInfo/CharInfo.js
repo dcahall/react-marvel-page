@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import './charInfo.scss';
+
 import Spinner from '../spinner/Spinner';
 import Skeleton from '../skeleton/Skeleton';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 
-import './charInfo.scss';
 import useMarvelService from '../../services/MarvelService';
+import { Link } from 'react-router-dom';
 
 const CharInfo = (props) => {
 
@@ -22,12 +24,13 @@ const CharInfo = (props) => {
 			return null;
 		}
 
+		
+		clearError();
 		getCharacter(props.charId)
 			.then(onCharLoaded)
 	}
 
 	const onCharLoaded = (char) => {
-		clearError();
 		setChar(char);
 	}
 
@@ -72,9 +75,12 @@ const View = ({char, imageExist}) => {
 			<ul className="char__comics-list">
 				{ comics.length
 					? comics.map((item, i) => {
+						const comicUrl = item.resourceURI;
+						const comicId = comicUrl.slice(comicUrl.lastIndexOf('/') + 1);
+
 						return (
 							<li className="char__comics-item" key={i}>
-								{item.name}
+								<Link to={`/comics/${comicId}`}>{item.name}</Link>
 							</li>
 						);
 					})

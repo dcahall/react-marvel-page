@@ -1,4 +1,6 @@
 import {useState, useEffect} from 'react';
+import { Link } from 'react-router-dom';
+
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -39,11 +41,11 @@ const ComicsList = () => {
         const items = arr.map((item, i) => {
             return (
                 <li className="comics__item" key={i}>
-                    <a href="#">
+                    <Link to={`/comics/${item.id}`}>
                         <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
                         <div className="comics__item-name">{item.title}</div>
                         <div className="comics__item-price">{item.price}</div>
-                    </a>
+                    </Link>
                 </li>
             )
         })
@@ -68,8 +70,7 @@ const ComicsList = () => {
             <button 
                 disabled={newItemLoading} 
                 style={{'display' : comicsEnded ? 'none' : 'block'}}
-                className="button button__main button__long"
-                onClick={() => onRequest(offset)}>
+				className={`button button__main button__long ${newItemLoading ? `button__long_active` : null}`}                onClick={() => onRequest(offset)}>
                 <div className="inner">load more</div>
             </button>
         </div>

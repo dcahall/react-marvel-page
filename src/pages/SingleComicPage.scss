@@ -1,4 +1,4 @@
-@import '../../style/variables.scss';
+@import '../style/variables.scss';
 
 .single-comic {
     margin-top: 50px;
@@ -30,10 +30,12 @@
     &__back {
         justify-self: end;
         font-weight: bold;
-        font-size: 18px;
+        font-size: 22px;
         line-height: 24px;
-        &:hover {
-            color: $main-color;
-        }
+		cursor: pointer;
+		&:hover {
+			color: $main-color;
+		}
     }
+
 }
