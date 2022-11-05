@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types'
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import './charList.scss';
 import useMarvelService from '../../services/MarvelService';
@@ -45,34 +46,35 @@ const CharList = (props) => {
 
 	const createItemList = () => {
 		const chars = charList.map((item, i) => {
-
-			return (<li
-						className="char__item"
-						key={item.id}
-						onClick={() => {
-							focusOnItem(i);
-							props.onCharSelected(item.id);
-						}}
-						onKeyPress={(e) => {
-							if (e.key === ' ' || e.key === 'Enter') {
-								props.onCharSelected(item.id);
+			return (
+					<CSSTransition key={item.id} timeout={500} classNames="char__item">
+						<li
+							className="char__item"
+							onClick={() => {
 								focusOnItem(i);
-							}
-						}}
-						ref={(el) => itemRefs.current[i] = el}
-						tabIndex="0">
-							<img
-							style={imageExist(item) ? {'objectFit': "contain"} : {'objectFit': "unset"}}
-							src={item.thumbnail}
-							alt={item.name}/>
-							<div className="char__name">{item.name}</div>
-					</li>)
+								props.onCharSelected(item.id);
+							}}
+							onKeyPress={(e) => {
+								if (e.key === ' ' || e.key === 'Enter') {
+									props.onCharSelected(item.id);
+									focusOnItem(i);
+								}
+							}}
+							ref={(el) => itemRefs.current[i] = el}
+							tabIndex="0">
+								<img
+								style={imageExist(item) ? {'objectFit': "contain"} : {'objectFit': "unset"}}
+								src={item.thumbnail}
+								alt={item.name}/>
+								<div className="char__name">{item.name}</div>
+						</li>
+					</CSSTransition>);
 		});
 
 		return (
-			<ul className="char__grid">
-				{chars}		
-			</ul>
+			<TransitionGroup component={'ul'} className="char__grid">
+				{chars}
+			</TransitionGroup>
 		);
 	}
 
@@ -82,7 +84,9 @@ const CharList = (props) => {
 
 	return (
 		<div className="char__list">
-			{errorMessage || spinner || itemList}
+			{ errorMessage }
+			{ spinner }
+			{ itemList}
 			<button
 				className={`button button__main button__long ${newItemLoading ? `button__long_active` : null}`}
 				disabled={newItemLoading}

@@ -4,7 +4,7 @@ import Spinner from '../components/spinner/Spinner';
 import ErrorMessage from '../components/errorMessage/ErrorMessage';
 import useMarvelService from '../services/MarvelService';
 
-import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
+import { useParams, useNavigate} from 'react-router-dom';
 import React from 'react';
 
 const SingleComicPage = () => {
