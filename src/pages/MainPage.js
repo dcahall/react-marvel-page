@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from "react-helmet";
 
 import decoration from '../resources/img/vision.png';
 
@@ -17,6 +18,12 @@ const MainPage = () => {
 
 	return (
 		<>
+			<Helmet>
+				<meta 
+					name="description"
+					content="Marvel information portal"/>
+				<title>Marvel information portal</title>
+			</Helmet>
 			<ErrorBoundary>
 				<RandomChar/>
 			</ErrorBoundary>

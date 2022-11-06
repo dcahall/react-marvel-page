@@ -19,10 +19,16 @@ const useMarvelService = () => {
 		return fullCharInfo ? _transformCharacter(fullCharInfo.data.results[0]) : null;
 	}
 
+	const getFullCharacter = async (id) => {
+		const fullCharInfo = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+
+		return fullCharInfo ? _transformFullCharacter(fullCharInfo.data.results[0]) : null;
+	}
+
 	const getCharacterByName = async (name) => {
 		const fullCharInfo = await request(`${_apiBase}characters?nameStartsWith=${name}${_apiKey}`);
 
-		return fullCharInfo.data.results.length ? _transformCharacter(fullCharInfo.data.results[0]) : null
+		return fullCharInfo.data.results.length ? _transformCharacter(fullCharInfo.data.results[0]) : {};
 	}
 
 	const getAllComics = async (offset = 0) => {
@@ -49,6 +55,17 @@ const useMarvelService = () => {
 		);
 	}
 
+	const _transformFullCharacter = (shortCharInfo) => {
+		return (
+			{
+				name: shortCharInfo.name,
+				description: shortCharInfo.description ? shortCharInfo.description : "There is no description for this character",
+				thumbnail: shortCharInfo.thumbnail.path + '.' + shortCharInfo.thumbnail.extension,
+				id: shortCharInfo.id,
+			}
+		);
+	}
+
 	const _transformComics = (comics) => {
         return {
             id: comics.id,
@@ -67,7 +84,17 @@ const useMarvelService = () => {
 				: true);
 	}
 
-	return { loading, error, getAllCharacters, getCharacter, imageExist, clearError, getAllComics, getComic, getCharacterByName, setLoading };
+	return { loading,
+				error,
+				getFullCharacter,
+				getAllCharacters,
+				getCharacter,
+				imageExist,
+				clearError,
+				getAllComics,
+				getComic,
+				getCharacterByName,
+				setLoading };
 }
 
 export default useMarvelService;

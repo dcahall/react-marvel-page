@@ -76,11 +76,11 @@ const View = ({char, imageExist}) => {
 				{ comics.length
 					? comics.map((item, i) => {
 						const comicUrl = item.resourceURI;
-						const comicId = comicUrl.slice(comicUrl.lastIndexOf('/') + 1);
+						const uniqId = comicUrl.slice(comicUrl.lastIndexOf('/') + 1);
 
 						return (
 							<li className="char__comics-item" key={i}>
-								<Link to={`/comics/${comicId}`}>{item.name}</Link>
+								<Link to={`/comics/${uniqId}`}>{item.name}</Link>
 							</li>
 						);
 					})

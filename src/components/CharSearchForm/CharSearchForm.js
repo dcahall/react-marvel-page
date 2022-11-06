@@ -19,7 +19,6 @@ const CharSearchForm = () => {
 	}, [])
 
 	const onCharLoaded = (char) => {
-		console.log(char);
 		setChar(char);
 	}
 
@@ -29,11 +28,11 @@ const CharSearchForm = () => {
 			.then(onCharLoaded);
 	}
 
-	const errorMessage = error ? <div className="char__search-critical-error"><FormikErrorMessage /></div> : null;
-    const results = !char ? null : char.length > 0 ?
+	const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
+    const results = !char ? null : char.name ?
                     <div className="char__search-wrapper">
-                        <div className="char__search-success">There is! Visit {char[0].name} page?</div>
-                        <Link to={`/characters/${char[0].id}`} className="button button__secondary">
+                        <div className="char__search-success">There is! Visit {char.name} page?</div>
+                        <Link to={`/characters/${char.id}`} className="button button__secondary">
                             <div className="inner">To page</div>
                         </Link>
                     </div> : 
