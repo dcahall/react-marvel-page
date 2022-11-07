@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet";
+import onKey from "../../utils/onKeyPress";
 
 import './SingleComicPage.scss';
 
@@ -26,11 +27,7 @@ const SingleComicPage = ({data, onNavigate}) => {
 				className="single-char__back"
 				onClick={onNavigate}
 				tabIndex={0}
-				onKeyPress={(e) => {
-					if (e.key === 'Enter') {
-						onNavigate()
-					}
-				}}>
+				onKeyPress={(e) => onKey(e, () => onNavigate())}>
 					Go back
 				</h2>
         </div>

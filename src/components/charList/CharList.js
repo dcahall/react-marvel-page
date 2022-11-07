@@ -5,6 +5,7 @@ import './charList.scss';
 import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
+import onKey from '../../utils/onKeyPress';
 
 const setContent = (process, Component, newItemLoading) => {
 	switch (process) {
@@ -21,7 +22,7 @@ const setContent = (process, Component, newItemLoading) => {
 	}
 }
 
-const CharList = (props) => {
+const 					CharList = (props) => {
 	const [charList, setCharList] = React.useState([]);
 	const [newItemLoading, setNewItemLoading] = React.useState(false);
 	const [offset, setOffset] = React.useState(210);
@@ -64,16 +65,14 @@ const CharList = (props) => {
 		const chars = charList.map((item, i) => {
 			return (
 					<li
+						key={item.id}
 						className="char__item"
 						onClick={() => {
 							focusOnItem(i);
 							props.onCharSelected(item.id);
 						}}
 						onKeyPress={(e) => {
-							if (e.key === ' ' || e.key === 'Enter') {
-								props.onCharSelected(item.id);
-								focusOnItem(i);
-							}
+							onKey(e, () => props.onCharSelected(item.id), () => focusOnItem(i))
 						}}
 						ref={(el) => itemRefs.current[i] = el}
 						tabIndex="0">

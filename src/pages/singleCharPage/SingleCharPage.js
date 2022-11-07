@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet";
 
 import AppBanner from "../../components/appBanner/AppBanner";
+import onKey from "../../utils/onKeyPress";
 import './SingleCharPage.scss'
 
 const SingleCharPage = ({data, onNavigate}) => {
@@ -26,11 +27,7 @@ const SingleCharPage = ({data, onNavigate}) => {
 				className="single-char__back"
 				onClick={onNavigate}
 				tabIndex={0}
-				onKeyPress={(e) => {
-					if (e.key === 'Enter') {
-						onNavigate()
-					}
-				}}>
+				onKeyPress={(e) => onKey(e, () => onNavigate())}>
 					Go back
 				</h2>
     	    </div>

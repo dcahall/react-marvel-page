@@ -2,6 +2,7 @@ import React from 'react';
 
 import useMarvelService from '../../services/MarvelService';
 import setContent from '../../utils/setContent';
+import onKey from '../../utils/onKeyPress';
 
 import mjolnir from '../../resources/img/mjolnir.png';
 import './randomChar.scss';
@@ -11,13 +12,13 @@ const RandomChar = () => {
 	
 	const [char, setChar] = React.useState({});
 	const { getCharacter, imageExist, setProcess, process} = useMarvelService();
-	let   timerId;
+	let   timerId = React.useRef(null);
 
 	React.useEffect(() => {
-		timerId = setInterval(updateChar, 60000);
+		timerId.current = setInterval(updateChar, 60000);
 
 		updateChar();
-		return (() => clearInterval(timerId));
+		return (() => clearInterval(timerId.current));
 		//eslint-disable-next-line
 	}, []);
 
@@ -26,7 +27,7 @@ const RandomChar = () => {
 	}
 
 	const onRandomChar = () =>  {
-		clearInterval(timerId);
+		clearInterval(timerId.current);
 		updateChar();
 	}
 
@@ -54,7 +55,9 @@ const RandomChar = () => {
 				<p className="randomchar__title">
 					Or choose another one
 				</p>
-				<button className="button button__main">
+				<button
+					className="button button__main"
+					onKeyPress={(e) => onKey(e, () => onRandomChar())}>
 					<div className="inner" onClick={onRandomChar}>try it</div>
 				</button>
 				<img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
