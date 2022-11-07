@@ -1,8 +1,7 @@
 import React from 'react';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage'
+import setContent from '../../utils/setContent';
 
 import mjolnir from '../../resources/img/mjolnir.png';
 import './randomChar.scss';
@@ -11,14 +10,15 @@ import './randomChar.scss';
 const RandomChar = () => {
 	
 	const [char, setChar] = React.useState({});
-	const {loading, error, getCharacter, imageExist, clearError} = useMarvelService();
+	const { getCharacter, imageExist, setProcess, process} = useMarvelService();
 	let   timerId;
 
 	React.useEffect(() => {
 		// timerId = setInterval(updateChar, 60000);
 
 		updateChar();
-		// return (() => clearInterval(timerId));	
+		// return (() => clearInterval(timerId));
+		//eslint-disable-next-line
 	}, []);
 
 	const onCharLoaded = (char) => {
@@ -26,26 +26,26 @@ const RandomChar = () => {
 	}
 
 	const onRandomChar = () =>  {
-		clearInterval(timerId);
+		// clearInterval(timerId);
 		updateChar();
 	}
 
 	const updateChar = () => {
 		const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 		
-		clearError();
 		getCharacter(id)
 			.then(onCharLoaded)
-			// .catch(onError);
+			.then(() => setProcess('confirmed'))
 	}
 
-	const errorMessage = error ? <ErrorMessage/> : null;
-	const spinner = loading ? <Spinner/> : null;
-	const imageEx = char ? imageExist(char) : null;
+	const element = React.useMemo(() => {
+		return setContent(process, () => <View data={char} imageExist={imageExist}/>)
+		//eslint-disable-next-line
+	}, [process])
 
 	return (
 		<div className="randomchar">
-			{errorMessage || spinner || <View char={char} imageExist={imageEx}/>}
+			{element}
 			<div className="randomchar__static">
 				<p className="randomchar__title">
 					Random character for today!<br/>
@@ -63,9 +63,9 @@ const RandomChar = () => {
 	);
 }
 
-const View = ({char, imageExist}) => {
-	const {name, description, thumbnail, homepage, wiki} = char;
-	const clazz = imageExist ? "randomchar__img__cover" : "randomchar__img__contain";
+const View = ({data, imageExist}) => {
+	const {name, description, thumbnail, homepage, wiki} = data;
+	const clazz = imageExist(data) ? "randomchar__img__cover" : "randomchar__img__contain";
 
 	return (
 		<div className="randomchar__block">

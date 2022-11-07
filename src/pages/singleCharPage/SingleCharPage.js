@@ -4,6 +4,7 @@ import AppBanner from "../../components/appBanner/AppBanner";
 import './SingleCharPage.scss'
 
 const SingleCharPage = ({data, onNavigate}) => {
+	console.log(data, onNavigate);
 	const { name, description, thumbnail } = data;
 
 	return (

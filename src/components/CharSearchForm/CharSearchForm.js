@@ -8,27 +8,22 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 
 import './CharSearchForm.scss';
-import { useEffect } from 'react'
 
 const CharSearchForm = () => {
 	const [char, setChar] = useState(null);
-	const {loading, error, getCharacterByName, clearError, setLoading} = useMarvelService();
-
-	useEffect(() => {
-		setLoading(false);
-	}, [])
+	const {getCharacterByName, process, setProcess} = useMarvelService();
 
 	const onCharLoaded = (char) => {
 		setChar(char);
 	}
 
 	const updateChar = (charName) => {
-		clearError();
 		getCharacterByName(charName)
-			.then(onCharLoaded);
+			.then(onCharLoaded)
+			.then(() => setProcess('confirmed'))
 	}
 
-	const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
+	const errorMessage = process === 'error' ? <div className="char__search-critical-error"><ErrorMessage /></div> : null;
     const results = !char ? null : char.name ?
                     <div className="char__search-wrapper">
                         <div className="char__search-success">There is! Visit {char.name} page?</div>
@@ -43,7 +38,7 @@ const CharSearchForm = () => {
 	return (
 		<div className='char__search-form'>
 			<Formik
-				initialValues={{charName: ''}}
+				initialValues={{charName: ''}}a
 				validationSchema={Yup.object({
 					charName: Yup.string()
 							.required('Field is required')
@@ -65,7 +60,7 @@ const CharSearchForm = () => {
 							<button 
 								type='submit' 
 								className="button button__main"
-								disabled={loading}>
+								disabled={process === 'loading'}>
 								<div className="inner">find</div>
 							</button>
 						</div>

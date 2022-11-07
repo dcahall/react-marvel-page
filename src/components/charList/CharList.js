@@ -1,22 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import './charList.scss';
 import useMarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
+const setContent = (process, Component, newItemLoading) => {
+	switch (process) {
+		case 'waiting':
+			return <Spinner/>;
+		case 'loading':
+			return newItemLoading ? <Component/> : <Spinner/>;
+		case 'error':
+			return <ErrorMessage/>;
+		case 'confirmed':
+			return <Component/>;
+		default: 
+			return new Error('Unknown state');
+	}
+}
+
 const CharList = (props) => {
 	const [charList, setCharList] = React.useState([]);
 	const [newItemLoading, setNewItemLoading] = React.useState(false);
 	const [offset, setOffset] = React.useState(210);
 	const [charEnded, setCharEnded] = React.useState(false);
-	const {loading, error, getAllCharacters, imageExist} = useMarvelService();
+	const {getAllCharacters, imageExist, setProcess, process} = useMarvelService();
 	const itemRefs = React.useRef([]);
 
 	React.useEffect(() => {
 		updateCharacters(offset, true);
+		//eslint-disable-next-line
 	}, []);
 
 	const onCharListLoaded = (newCharList) => {
@@ -28,7 +43,7 @@ const CharList = (props) => {
 		setCharList(charList => [...charList, ...newCharList]);
 		setNewItemLoading(newItemLoading => false);
 		setOffset(offset => offset + 9);
-		setCharEnded(ended => ended);
+		setCharEnded(ended);
 	}
 
 	const updateCharacters = (offset, initial) => {
@@ -36,6 +51,7 @@ const CharList = (props) => {
 		
 		getAllCharacters(offset)
 			.then(onCharListLoaded)
+			.then(() => setProcess('confirmed'))
 	}
 
 	const focusOnItem = (id) => {
@@ -44,49 +60,46 @@ const CharList = (props) => {
 		itemRefs.current[id].focus();
 	}
 
-	const createItemList = () => {
+	const createItemList = (charList) => {
 		const chars = charList.map((item, i) => {
 			return (
-					<CSSTransition key={item.id} timeout={500} classNames="char__item">
-						<li
-							className="char__item"
-							onClick={() => {
-								focusOnItem(i);
+					<li
+						className="char__item"
+						onClick={() => {
+							focusOnItem(i);
+							props.onCharSelected(item.id);
+						}}
+						onKeyPress={(e) => {
+							if (e.key === ' ' || e.key === 'Enter') {
 								props.onCharSelected(item.id);
-							}}
-							onKeyPress={(e) => {
-								if (e.key === ' ' || e.key === 'Enter') {
-									props.onCharSelected(item.id);
-									focusOnItem(i);
-								}
-							}}
-							ref={(el) => itemRefs.current[i] = el}
-							tabIndex="0">
-								<img
-								style={imageExist(item) ? {'objectFit': "contain"} : {'objectFit': "unset"}}
-								src={item.thumbnail}
-								alt={item.name}/>
-								<div className="char__name">{item.name}</div>
-						</li>
-					</CSSTransition>);
+								focusOnItem(i);
+							}
+						}}
+						ref={(el) => itemRefs.current[i] = el}
+						tabIndex="0">
+							<img
+							style={imageExist(item) ? {'objectFit': "contain"} : {'objectFit': "unset"}}
+							src={item.thumbnail}
+							alt={item.name}/>
+							<div className="char__name">{item.name}</div>
+					</li>);
 		});
 
 		return (
-			<TransitionGroup component={'ul'} className="char__grid">
+			<ul className="char__grid">
 				{chars}
-			</TransitionGroup>
+			</ul>
 		);
 	}
 
-	const itemList = createItemList();
-	const errorMessage = error ? <ErrorMessage/> : null;
-	const spinner = loading && !newItemLoading ? <Spinner/> : null;
+	const elements = React.useMemo(() => {
+		return setContent(process, () => createItemList(charList), newItemLoading);
+		//eslint-disable-next-line
+	}, [process]);
 
 	return (
 		<div className="char__list">
-			{ errorMessage }
-			{ spinner }
-			{ itemList}
+			{elements}
 			<button
 				className={`button button__main button__long ${newItemLoading ? `button__long_active` : null}`}
 				disabled={newItemLoading}

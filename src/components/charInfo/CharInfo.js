@@ -1,22 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import './charInfo.scss';
 
-import Spinner from '../spinner/Spinner';
-import Skeleton from '../skeleton/Skeleton';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-
 import useMarvelService from '../../services/MarvelService';
-import { Link } from 'react-router-dom';
+import setContent from '../../utils/setContent';
 
 const CharInfo = (props) => {
 
 	const [char, setChar] = React.useState(null);
-	const {loading, error, getCharacter, imageExist, clearError} = useMarvelService();
+	const {getCharacter, imageExist, setProcess, process} = useMarvelService();
 
 	React.useEffect(() => {
 		updateChar();
+		//eslint-disable-next-line
 	}, [props.charId])
 
 	const updateChar = () => {
@@ -24,31 +22,26 @@ const CharInfo = (props) => {
 			return null;
 		}
 
-		
-		clearError();
 		getCharacter(props.charId)
 			.then(onCharLoaded)
+
+			.then(() => setProcess('confirmed'));
 	}
 
 	const onCharLoaded = (char) => {
 		setChar(char);
 	}
 
-	const imageEx = char ? imageExist(char) : null;
-	const skeleton = char ? null : <Skeleton/>
-	const errorMessage = error ? <ErrorMessage/> : null;
-	const spinner = loading ? <Spinner/> : null;
-	const content = char ? <View char={char} imageExist={imageEx} /> : null;
-
 	return (
 		<div className="char__info">
-			{errorMessage || skeleton || spinner || content}
+			{setContent(process, () => <View data={char} imageExist={imageExist}/>)}
 		</div>
 	);
 }
 
-const View = ({char, imageExist}) => {
-	const {name, description, thumbnail, homepage, wiki, comics} = char;
+const View = ({data, imageExist}) => {
+	const {name, description, thumbnail, homepage, wiki, comics} = data;
+	const imageEx = imageExist(data);
 
 	return (
 		<>
@@ -56,7 +49,7 @@ const View = ({char, imageExist}) => {
 				<img
 					src={thumbnail}
 					alt={name}
-					style={imageExist ? {"objectFit" : 'cover'} : {"objectFit" : 'contain'}}
+					style={imageEx ? {"objectFit" : 'cover'} : {"objectFit" : 'contain'}}
 				/>
 				<div>
 					<div className="char__info-name">{name}</div>

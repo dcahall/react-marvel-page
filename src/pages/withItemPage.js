@@ -1,24 +1,22 @@
 import { useParams, useNavigate} from 'react-router-dom';
 import React from 'react';
 
-import Spinner from '../components/spinner/Spinner';
-import ErrorMessage from '../components/errorMessage/ErrorMessage';
 import useMarvelService from '../services/MarvelService';
-
+import setContent from '../utils/setContent';
 
 const withItemPage = (BaseComponent, getData) => {
 	return (() => {
 			const { uniqId } = useParams();
 			const [ data, setData ] = React.useState(null);
-			const { loading, error, clearError, getFullCharacter, getComic } = useMarvelService();
+			const { getFullCharacter, getComic, process, setProcess } = useMarvelService();
 			const navigate = useNavigate();
 			
 			React.useEffect(() => {
 				updateData();
+				//eslint-disable-next-line
 			}, [uniqId])
 		
 			const updateData = () => {
-				clearError();
 
 				if (getData === 'comic'){
 					getComic(uniqId)
@@ -27,10 +25,12 @@ const withItemPage = (BaseComponent, getData) => {
 					getFullCharacter(uniqId)
 						.then(onDataLoaded)
 				}
+				
 			}
 		
 			const onDataLoaded = (data) => {
 				setData(data);
+				setProcess('confirmed');
 			}
 			
 			const onNavigate = () => {
@@ -40,15 +40,16 @@ const withItemPage = (BaseComponent, getData) => {
 					navigate(-1);
 				}
 			}
-		
-			const errorMessage = error ? <ErrorMessage/> : null;
-			const spinner = loading ? <Spinner/> : null;
-			const content = data ? <BaseComponent data={data} onNavigate={onNavigate}/> : null;
-		
+			
+			const elements = React.useMemo(() => {
+				return setContent(process, () => <BaseComponent data={data} onNavigate={onNavigate}/>);
+				//eslint-disable-next-line
+			}, [process])
+
 		
 			return (
 				<>
-					{errorMessage || spinner || <BaseComponent onNavigate={onNavigate} data={data}/>}
+					{elements}
 				</>
 			)
 		}
