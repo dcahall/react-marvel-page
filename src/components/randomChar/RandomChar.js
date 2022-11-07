@@ -14,10 +14,10 @@ const RandomChar = () => {
 	let   timerId;
 
 	React.useEffect(() => {
-		// timerId = setInterval(updateChar, 60000);
+		timerId = setInterval(updateChar, 60000);
 
 		updateChar();
-		// return (() => clearInterval(timerId));
+		return (() => clearInterval(timerId));
 		//eslint-disable-next-line
 	}, []);
 
@@ -26,7 +26,7 @@ const RandomChar = () => {
 	}
 
 	const onRandomChar = () =>  {
-		// clearInterval(timerId);
+		clearInterval(timerId);
 		updateChar();
 	}
 

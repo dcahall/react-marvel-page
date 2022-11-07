@@ -24,7 +24,15 @@ const SingleCharPage = ({data, onNavigate}) => {
             </div>
 			<h2
 				className="single-char__back"
-				onClick={onNavigate}>Go back</h2>
+				onClick={onNavigate}
+				tabIndex={0}
+				onKeyPress={(e) => {
+					if (e.key === 'Enter') {
+						onNavigate()
+					}
+				}}>
+					Go back
+				</h2>
     	    </div>
 		</>
 	);

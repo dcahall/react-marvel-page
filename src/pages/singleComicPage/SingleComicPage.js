@@ -23,8 +23,16 @@ const SingleComicPage = ({data, onNavigate}) => {
                 <div className="single-comic__price">{price}</div>
             </div>
 			<h2
-				className="single-comic__back"
-				onClick={onNavigate}>Go back</h2>
+				className="single-char__back"
+				onClick={onNavigate}
+				tabIndex={0}
+				onKeyPress={(e) => {
+					if (e.key === 'Enter') {
+						onNavigate()
+					}
+				}}>
+					Go back
+				</h2>
         </div>
 	);
 }
